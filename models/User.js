@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import * as moongoose from "mongoose";
 
 const UserScheme = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
@@ -8,8 +7,8 @@ const UserScheme = new mongoose.Schema({
     password: { type: String, required: true },
     bio: { type: String, default: "" },
     avatar: { type: String, default: "" },
-    followers: [{ types: moongoose.Schema.Types.ObjectId, ref: 'User' }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 UserScheme.pre("save", async function (next) {
