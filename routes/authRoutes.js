@@ -1,7 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-import user from "../models/User.js";
 
 const router = express.Router();
 
@@ -30,7 +29,7 @@ router.post('/register', async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password} = req.body;
-        const user = await User.findOne( { eamil });
+        const user = await User.findOne( { email });
 
         if(user && (await user.matchPassword(password))) {
             res.json({
