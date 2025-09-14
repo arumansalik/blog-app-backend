@@ -38,4 +38,15 @@ router.get("/", async (req, res) => {
             message: err.message
         });
     }
-})
+});
+
+// Get single post
+router.get("/:id", async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id).populate("author", "username avatar");
+        if(!post) return res.status(404).json({ message: "Post Not Found" });
+        res.json(post);
+    } catch (err) {
+        res.status(500).json({message: err.message});
+    }
+});
