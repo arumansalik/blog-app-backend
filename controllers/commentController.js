@@ -89,6 +89,16 @@ export const toggleLikeComment = async (req, res) => {
         const comment = await Comment.findById(commentId);
         if (!comment) return res.status(404).json({ message: "Comment not found" });
 
+        const userId = req.user._id;
+        if(comment.likes.includes(userId)) {
+            comment.likes.pull(userId);
+        } else {
+            comment.likes.push(userId);
+        }
 
+        await comment.save();
+        res.json(comment);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-}
+};
