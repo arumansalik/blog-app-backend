@@ -38,3 +38,29 @@ export const replyToComment = async (req, res) => {
         res.status(500).json({ message : err.message });
     }
 }
+
+export const getCommentsByPost = async (req, res) => {
+    try {
+        const { postId } = req.params;
+
+        const comments = await Comment.find({ post: postId, parentComment: null})
+            .populate("author", "username avatar")
+            .populate({
+                path: "likes",
+                select: "username"
+            })
+            .lean();
+
+        for(let comment of comments) {
+            comment.replies = await Comment.find({ parentComment: comment._id})
+                .populate("author", "username avatar")
+                .populate({
+                    path: "likes",
+                    select: "username"
+                });
+        }
+        res.json(comments);
+    } catch (error) {
+        res.status(500).json({ message: error.message});
+    }
+};
