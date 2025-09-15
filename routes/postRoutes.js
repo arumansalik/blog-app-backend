@@ -51,6 +51,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+//Update a post
 router.put("/:id", protect, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
@@ -75,7 +76,7 @@ router.put("/:id", protect, async (req, res) => {
 
 
 //Delete a post
-router.delete(":/id", protect, async (req, res) => {
+router.delete("/:id", protect, async (req, res) => {
     try {
         const post = await Post.findById(req.params.id);
 
