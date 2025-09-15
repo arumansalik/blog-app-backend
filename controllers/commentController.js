@@ -6,7 +6,7 @@ export const addComment = async (req, res) => {
         const { content } = req.body;
         const { postId } = req.params;
 
-        const newComment = new Comment.create({
+        const newComment = await Comment.create({
             content,
             author: req.user._id,
             post: postId,
@@ -72,7 +72,7 @@ export const deleteComment = async (req, res) => {
         const comment = await Comment.findById(commentId);
         if(!comment) return res.status(404).json({ message: "Comment not found" });
 
-        if(commentId.author.toString() !== req.user._id.toString()) {
+        if(comment.author.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: "Not authorized" });
         }
 
