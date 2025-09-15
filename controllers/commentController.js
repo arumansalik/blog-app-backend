@@ -64,3 +64,31 @@ export const getCommentsByPost = async (req, res) => {
         res.status(500).json({ message: error.message});
     }
 };
+
+export const deleteComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+
+        const comment = await Comment.findById(commentId);
+        if(!comment) return res.status(404).json({ message: "Comment not found" });
+
+        if(commentId.author.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        await Comment.findByIdAndDelete(commentId);
+        res.json({ message: "Comment deleted" });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const toggleLikeComment = async (req, res) => {
+    try {
+        const { commentId } = req.params;
+        const comment = await Comment.findById(commentId);
+        if (!comment) return res.status(404).json({ message: "Comment not found" });
+
+
+    }
+}
