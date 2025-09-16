@@ -47,8 +47,32 @@ export const followUser = async (req, res) => {
 
         if(!userToFollow.followers.includes(currentUser._id)) {
             userToFollow.followers.push(currentUser._id);
+            currentUser.following.push(userToFollow._id);
+            await userToFollow.save();
+            await currentUser.save();
         }
+
+        res.json({ message: "Followed Successfully" });
     } catch (err) {
         res.status(500).json({ message: error.message });
     }
-}
+};
+
+export const unfollowUser = async (req, res) => {
+    try {
+        const userToUnfollow = await User.findById(req.params.id);
+        const currentUser = await User.findById(req.user._id);
+
+        if(!userToUnfollow) return res.status(404).json({ message: "User not found" });
+
+        userToUnfollow.followers.pull(currentUser._id);
+        currentUser.following.pull(userToUnfollow._id);
+
+        await userToUnfollow.save();
+        await currentUser.save();
+
+        res.json({ message: "unfollowed Successfully" });
+    } catch (err) {
+        res.status(500).json({ message: error.message });
+    }
+};
