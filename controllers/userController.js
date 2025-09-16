@@ -5,17 +5,36 @@ import error from "jsonwebtoken/lib/JsonWebTokenError.js";
 // Get Public Profile
 export const getUserProfile = async (req, res) => {
     try {
-        const {username} = req.params;
-        const user = await User.findOne({username})
-            .select('-password')
+        const { username } = req.params;
+
+        const user = await User.findOne({ username })
+            .select("-password")
             .populate("followers", "username avatar")
             .populate("following", "username avatar");
 
-        if(!user) return res.status(404).json({ message: "User not found"});
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-        const posts = await Post.find({ author: user._id });
+        // Posts authored by the user
+        const posts = await Post.find({ author: user._id })
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
 
-        res.json({ user, posts });
+        // Bookmarked posts
+        const bookmarks = await Post.find({ _id: { $in: user.bookmarks } })
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
+
+        // Liked posts
+        const likedPosts = await Post.find({ likes: user._id })
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
+
+        res.json({
+            user,
+            posts,
+            bookmarks,
+            likedPosts,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -100,35 +119,18 @@ export const getFollowing = async (req, res) => {
     }
 };
 
-export const getUserProfile = async (req, res) => {
+export const getBookmarkedPosts = async (req, res) => {
     try {
-        const {username } = req.params;
+        const { id } = req.params;
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-        const user = await User.findOne({ username })
-            .select('-password')
-            .lean();
+        const posts = await Post.find({ bookmarks: user._id })
+            .populate("author", "username avatar")
+            .sort({ createdAt: -1 });
 
-        if(!user) return res.status(404).json({ message: "User not found"});
-
-        const posts = await Post.find({ author: user._id})
-            .sort({ createdAt: -1 })
-            .populate("author", "username avatar");
-
-        const bookmarks = await Post.find({ _id: { $in: user.bookmarks }})
-            .sort({ createdAt: -1 })
-            .populate("author", "username avatar");
-
-        const likePosts = await Post.find({ likes: user._id})
-            .sort({ createdAt: -1 })
-            .populate("author", "username avatar");
-
-        res.json({
-            user,
-            posts,
-            bookmarks,
-            likePosts
-        });
-    } catch (err) {
+        res.json(posts);
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
