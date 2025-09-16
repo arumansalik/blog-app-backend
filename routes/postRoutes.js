@@ -1,6 +1,11 @@
 import express from 'express';
 import Post from '../models/Post.js';
 import protect from "../middleware/authMiddleware.js";
+import {
+    toggleLikePost,
+    toggleBookmarkPost,
+    incrementPostView
+} from "../controllers/postController.js";
 
 const router = express.Router();
 
@@ -93,5 +98,13 @@ router.delete("/:id", protect, async (req, res) => {
     }
 });
 
+// Like/Unlike a post
+router.put("/:postId/like", protect, toggleLikePost);
+
+// Bookmark/Unbookmark a post
+router.put("/:postId/bookmark", protect, toggleBookmarkPost);
+
+// Increment views (public route)
+router.put("/:postId/view", incrementPostViews);
 
 export default router;
