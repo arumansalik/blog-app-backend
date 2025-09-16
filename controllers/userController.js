@@ -7,7 +7,7 @@ export const getUserProfile = async (req, res) => {
     try {
         const {username} = req.params;
         const user = await User.findOne({username})
-            .select('user')
+            .select('-password')
             .populate("followers", "username avatar")
             .populate("following", "username avatar");
 
@@ -96,6 +96,39 @@ export const getFollowing = async (req, res) => {
 
         res.json(user.following);
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getUserProfile = async (req, res) => {
+    try {
+        const {username } = req.params;
+
+        const user = await User.findOne({ username })
+            .select('-password')
+            .lean();
+
+        if(!user) return res.status(404).json({ message: "User not found"});
+
+        const posts = await Post.find({ author: user._id})
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
+
+        const bookmarks = await Post.find({ _id: { $in: user.bookmarks }})
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
+
+        const likePosts = await Post.find({ likes: user._id})
+            .sort({ createdAt: -1 })
+            .populate("author", "username avatar");
+
+        res.json({
+            user,
+            posts,
+            bookmarks,
+            likePosts
+        });
+    } catch (err) {
         res.status(500).json({ message: error.message });
     }
 };
