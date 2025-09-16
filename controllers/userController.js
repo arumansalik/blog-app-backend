@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Post from '../models/Post.js';
+import error from "jsonwebtoken/lib/JsonWebTokenError.js";
 
 // Get Public Profile
 export const getUserProfile = async (req, res) => {
@@ -38,5 +39,16 @@ export const updateUserProfile = async (req, res) => {
 }
 
 export const followUser = async (req, res) => {
+    try {
+        const userToFollow = await User.findById(req.params.id);
+        const currentUser = await User.findById(req.user._id);
 
+        if (!userToFollow) return res.status(404).json({ message: "User not found" });
+
+        if(!userToFollow.followers.includes(currentUser._id)) {
+            userToFollow.followers.push(currentUser._id);
+        }
+    } catch (err) {
+        res.status(500).json({ message: error.message });
+    }
 }
