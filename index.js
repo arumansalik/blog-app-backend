@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoutes from "../server/routes/authRoutes.js";
 import postRoutes from "../server/routes/postRoutes.js";
 import commentRoutes from "../server/routes/commentRoutes.js";
+import userRoutes from "../server/routes/userRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/users", userRoutes);
 
 
 app.get("/", (req, res) => {
