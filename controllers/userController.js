@@ -76,3 +76,26 @@ export const unfollowUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getFollowers = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .populate("followers", "username avatar");
+        if(!user) return res.status(404).json({ message: "User not found"});
+
+        res.json(user.followers);
+    } catch (err) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getFollowing = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).populate("following", "username avatar");
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.json(user.following);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
