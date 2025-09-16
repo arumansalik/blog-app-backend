@@ -36,6 +36,7 @@ export const toggleBookmarkPost = async (req, res) => {
         }
 
         await post.save();
+        res.json(post);
     } catch (e) {
         res.status(500).json({ message: e.message });
     }

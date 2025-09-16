@@ -7,6 +7,11 @@ const UserScheme = new mongoose.Schema({
     password: { type: String, required: true },
     bio: { type: String, default: "" },
     avatar: { type: String, default: "" },
+    socialLinks: {
+        twitter: { type: String, default: "" },
+        facebook: { type: String, default: "" },
+        website: { type: String, default: "" }
+    },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });

@@ -105,6 +105,6 @@ router.put("/:postId/like", protect, toggleLikePost);
 router.put("/:postId/bookmark", protect, toggleBookmarkPost);
 
 // Increment views (public route)
-router.put("/:postId/view", incrementPostViews);
+router.put("/:postId/view", incrementPostView);
 
 export default router;
