@@ -6,7 +6,8 @@ import {
     followUser,
     unfollowUser,
     getFollowers,
-    getFollowing
+    getFollowing,
+    getBookmarkedPosts
 } from "../controllers/userController.js";
 
 
@@ -19,5 +20,6 @@ router.put("/:id/follow", protect, followUser);
 router.put("/:id/unfollow", protect, unfollowUser);
 router.get("/:id/followers", getFollowers);
 router.get("/:id/following", getFollowing);
+router.get("/:id/bookmarks", protect, getBookmarkedPosts);
 
 export default router;
