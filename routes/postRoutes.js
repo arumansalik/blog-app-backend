@@ -4,10 +4,12 @@ import protect from "../middleware/authMiddleware.js";
 import {
     toggleLikePost,
     toggleBookmarkPost,
-    incrementPostView
+    incrementPostView, getFeed
 } from "../controllers/postController.js";
 
 const router = express.Router();
+
+router.get("/feed", protect, getFeed);
 
 // Create a post
 router.post("/", protect, async (req, res) => {
@@ -98,6 +100,8 @@ router.delete("/:id", protect, async (req, res) => {
     }
 });
 
+
+
 // Like/Unlike a post
 router.put("/:postId/like", protect, toggleLikePost);
 
@@ -106,5 +110,7 @@ router.put("/:postId/bookmark", protect, toggleBookmarkPost);
 
 // Increment views (public route)
 router.put("/:postId/view", incrementPostView);
+
+
 
 export default router;
