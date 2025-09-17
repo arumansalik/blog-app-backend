@@ -6,6 +6,7 @@ import authRoutes from "../server/routes/authRoutes.js";
 import postRoutes from "../server/routes/postRoutes.js";
 import commentRoutes from "../server/routes/commentRoutes.js";
 import userRoutes from "../server/routes/userRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -15,6 +16,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/search", searchRoutes);
 
 
 app.get("/", (req, res) => {
