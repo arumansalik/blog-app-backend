@@ -1,4 +1,5 @@
 import Post from "../models/Post.js";
+import User from "../models/User.js";
 
 export const toggleLikePost = async (req, res) => {
     try {
@@ -59,3 +60,23 @@ export const incrementPostView = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getFeed = async (req, res) => {
+    try {
+        const currentUser = await User.findById(req.user._id);
+
+        if(!currentUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const posts = await Post.find({
+            author: { $in: [...currentUser.following, currentUser._id]}
+        })
+            .populate("author", "username avatar")
+            .sort({ createdAt: -1});
+
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
