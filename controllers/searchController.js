@@ -25,6 +25,17 @@ export const searchPosts = async (req, res) => {
 export const searchUsers = async (req, res) => {
     try {
         const { q } = req.query;
+        if (!q) return res.status(400).json({ message: "Search query required" });
 
+        const users = await User.find({
+            $or: [
+                {username: { $regex: q , $options: "i" }},
+                { bio: { $regex: q , $options: "i" }}
+            ]
+        }).select("username avatar bio");
+
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 }
