@@ -1,7 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
-
 const router = express.Router();
 
 const generateToken = (id) => {
@@ -16,10 +15,12 @@ router.post('/register', async (req, res) => {
 
         const user = await User.create({ username, email, password});
         res.status(201).json({
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            token: generateToken(user._id),
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email
+            },
+            token: generateToken(user._id)
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,9 +34,11 @@ router.post("/login", async (req, res) => {
 
         if(user && (await user.matchPassword(password))) {
             res.json({
-                _id: user._id,
-                username: user.username,
-                email: user.email,
+                user: {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email
+                },
                 token: generateToken(user._id)
             });
         } else {
