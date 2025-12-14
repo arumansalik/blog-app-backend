@@ -36,14 +36,21 @@ router.post("/", protect, async (req, res) => {
 //get All posts
 router.get("/", async (req, res) => {
     try {
+        const skip = parseInt(req.query.skip || 0, 10);
+        const limit = Math.min(parseInt(req.query.limit || 20, 10), 50); // cap limit
+
         const posts = await Post.find()
             .populate("author", "username avatar")
-            .sort({ createdAt: -1 });
-        res.json(posts);
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Also return total count so frontend can know when to stop (optional)
+        const total = await Post.countDocuments();
+
+        res.json({ posts, total });
     } catch (err) {
-        res.status(500).json({
-            message: err.message
-        });
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -100,6 +107,81 @@ router.delete("/:id", protect, async (req, res) => {
     }
 });
 
+/* -------------------------------------------
+   🔥 TRENDING POSTS (Top 5 by likes + views)
+-------------------------------------------- */
+router.get("/trending", async (req, res) => {
+    try {
+        const posts = await Post.find()
+            .sort({ likes: -1, views: -1 })
+            .limit(5)
+            .populate("author", "username avatar");
+
+        res.json({ posts });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/* -------------------------------------------
+   🔥 POPULAR TAGS (Top 10 unique tags)
+-------------------------------------------- */
+router.get("/tags", async (req, res) => {
+    try {
+        const posts = await Post.find({});
+        let tagList = [];
+
+        posts.forEach((post) => {
+            if (post.tags) tagList.push(...post.tags);
+        });
+
+        const uniqueTags = [...new Set(tagList)].slice(0, 10);
+
+        res.json({ tags: uniqueTags });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/* -------------------------------------------
+   🔥 TOP WRITERS (Rank by post count)
+-------------------------------------------- */
+router.get("/top-writers", async (req, res) => {
+    try {
+        const writers = await Post.aggregate([
+            {
+                $group: {
+                    _id: "$author",
+                    posts: { $sum: 1 }
+                }
+            },
+            { $sort: { posts: -1 } },
+            { $limit: 5 },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            { $unwind: "$user" },
+            {
+                $project: {
+                    _id: 1,
+                    posts: 1,
+                    username: "$user.username",
+                    avatar: "$user.avatar"
+                }
+            }
+        ]);
+
+        res.json({ writers });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 
 // Like/Unlike a post
@@ -110,6 +192,7 @@ router.put("/:postId/bookmark", protect, toggleBookmarkPost);
 
 // Increment views (public route)
 router.put("/:postId/view", incrementPostView);
+
 
 
 
