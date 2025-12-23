@@ -11,7 +11,13 @@ import exploreRoutes from "../server/routes/exploreRoutes.js";
 
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "http://localhost:3000",
+        credentials: true,
+    })
+);
+
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
@@ -25,10 +31,14 @@ app.get("/", (req, res) => {
     res.send("Blog API running");
 });
 
-mongoose.connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-}).then(() => {
-    console.log("MongoDb Connected!");
-    app.listen(5000, () => console.log("Server Starting on http://localhost:5000!"));
-}).catch(err => console.log(err));
+const PORT = process.env.PORT || 5000;
+
+mongoose
+    .connect(process.env.MONGO_URL)
+    .then(() => {
+        console.log("MongoDB Connected");
+        app.listen(PORT, () =>
+            console.log(`Server running on port ${PORT}`)
+        );
+    })
+    .catch((err) => console.error(err));
