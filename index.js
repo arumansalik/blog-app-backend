@@ -12,12 +12,28 @@ import exploreRoutes from "./routes/exploreRoutes.js";
 
 dotenv.config();
 const app = express();
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://blog-app-frontend-hyo419ctt-aruman-saliks-projects.vercel.app"
+];
+
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || "http://localhost:3000",
+        origin: function (origin, callback) {
+            // allow requests with no origin (like Postman)
+            if (!origin) return callback(null, true);
+
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            } else {
+                return callback(new Error("Not allowed by CORS"));
+            }
+        },
         credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     })
 );
+
 
 app.use(express.json());
 app.use("/api/auth", authRoutes);
