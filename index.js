@@ -14,25 +14,31 @@ dotenv.config();
 const app = express();
 const allowedOrigins = [
     "http://localhost:3000",
-    "https://blog-app-frontend-hyo419ctt-aruman-saliks-projects.vercel.app"
+    /^https:\/\/blog-app-frontend-.*\.vercel\.app$/
 ];
 
 app.use(
     cors({
         origin: function (origin, callback) {
-            // allow requests with no origin (like Postman)
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.includes(origin)) {
-                return callback(null, true);
+            const isAllowed = allowedOrigins.some((allowed) =>
+                allowed instanceof RegExp
+                    ? allowed.test(origin)
+                    : allowed === origin
+            );
+
+            if (isAllowed) {
+                callback(null, true);
             } else {
-                return callback(new Error("Not allowed by CORS"));
+                callback(new Error("Not allowed by CORS: " + origin));
             }
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     })
 );
+
 
 
 app.use(express.json());
