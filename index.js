@@ -2,12 +2,13 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import authRoutes from "../server/routes/authRoutes.js";
-import postRoutes from "../server/routes/postRoutes.js";
-import commentRoutes from "../server/routes/commentRoutes.js";
-import userRoutes from "../server/routes/userRoutes.js";
-import searchRoutes from "../server/routes/searchRoutes.js";
-import exploreRoutes from "../server/routes/exploreRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
+import exploreRoutes from "./routes/exploreRoutes.js";
+
 
 dotenv.config();
 const app = express();
